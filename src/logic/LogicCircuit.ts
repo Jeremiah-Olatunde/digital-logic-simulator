@@ -2,6 +2,8 @@
 import Graph from "../graph/graph.js";
 import CircuitElement from "./CircuitElement.js";
 
+type BoolInt = 0 | 1;
+
 export default class LogicCircuit {
   public inputs: Set<string> = new Set();
   public outputs: Set<string> = new Set();
@@ -24,35 +26,35 @@ export default class LogicCircuit {
   //---------------------------------------------------------------------------
     
   //--- IO --------------------------------------------------------------------
-    public addInput(uid: string, value: boolean){
+    public addInput(uid: string, value: BoolInt){
       this.circuit.addVertex(CircuitElement.input(uid, value));
       this.inputs.add(uid);
     }
 
-     public addOutput(uid: string, value?: boolean){
+     public addOutput(uid: string, value?: BoolInt){
       this.circuit.addVertex(CircuitElement.output(uid, value));
       this.outputs.add(uid);
     }
 
-    public setInput(uid: string, value: boolean){
+    public setInput(uid: string, value: BoolInt){
       if(!this.inputs.has(uid)) throw new Error(`INPUT(${uid}) does not exist`);
       // if(this.circuit.getVertex(uid).cachedValue === value) return;
       this.circuit.getVertex(uid).cachedValue = value;
     }
 
-    public getInput(uid: string): boolean {
+    public getInput(uid: string): BoolInt {
       if(!this.inputs.has(uid)) throw new Error(`INPUT(${uid}) does not exist`);
       return this.circuit.getVertex(uid).cachedValue;
     }
   //---------------------------------------------------------------------------
 
   //--- LOGIC GATES -----------------------------------------------------------
-    public addGate(uid: string, inputCount: number, logic: (inputs: boolean[]) => boolean){
+    public addGate(uid: string, inputCount: number, logic: (inputs: BoolInt[]) => BoolInt){
       this.circuit.addVertex(CircuitElement.gate(uid, inputCount, logic));
     }
 
     public addNotGate(uid: string){
-      this.addGate(uid, 1, inputs => !inputs[0]);
+      this.addGate(uid, 1, inputs => inputs[0] ? 0 : 1);
     }
 
     public addOrGate(uid: string, inputCount: number){
@@ -60,7 +62,7 @@ export default class LogicCircuit {
     }
 
     public addNorGate(uid: string, inputCount: number){
-      this.addGate(uid, inputCount, inputs => !inputs.reduce((p, v) => p || v));
+      this.addGate(uid, inputCount, inputs => inputs.reduce((p, v) => p || v) ? 0 : 1);
     }
 
     public addAndGate(uid: string, inputCount: number){
@@ -68,7 +70,7 @@ export default class LogicCircuit {
     }
     
     public addNandGate(uid: string, inputCount: number){
-      this.addGate(uid, inputCount, inputs => !inputs.reduce((p, v) => p && v));
+      this.addGate(uid, inputCount, inputs => inputs.reduce((p, v) => p && v) ? 0 : 1);
     }
   //---------------------------------------------------------------------------
 
@@ -95,10 +97,10 @@ export default class LogicCircuit {
   //---------------------------------------------------------------------------
 
   //--- EVALUATION ------------------------------------------------------------
-    public evaluateOutput(uid: string): boolean {
+    public evaluateOutput(uid: string): BoolInt {
       if(!this.outputs.has(uid)) throw new Error(`OUTPUT(${uid}) NOT FOUND`);
 
-      const accum: [string, boolean][] = [];
+      const accum: [string, BoolInt][] = [];
 
       this.circuit.dfs(uid, "outward", {
         preOrder: (v, { visited }) => { 

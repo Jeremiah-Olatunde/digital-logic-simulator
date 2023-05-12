@@ -6,8 +6,8 @@ describe("combinational circuits", () => {
     const xor = new LogicBlock("xor", (circuit) => {
       circuit.addOutput("Y");
 
-      circuit.addInput("A", false);
-      circuit.addInput("B", false);
+      circuit.addInput("A", 0);
+      circuit.addInput("B", 0);
 
       circuit.addNotGate("NOT:A");
       circuit.addNotGate("NOT:B");
@@ -33,27 +33,27 @@ describe("combinational circuits", () => {
       circuit.connect("AND:B", "A");
     });
 
-    xor.setInput("A", false);
-    xor.setInput("B", false);
-    expect(xor.evaluateOutput("Y")).toBe(Boolean(0 ^ 0));
+    xor.setInput("A", 0);
+    xor.setInput("B", 0);
+    expect(xor.evaluateOutput("Y")).toBe(0 ^ 0);
 
-    xor.setInput("A", false);
-    xor.setInput("B", true);
-    expect(xor.evaluateOutput("Y")).toBe(Boolean(0 ^ 1));
+    xor.setInput("A", 0);
+    xor.setInput("B", 1);
+    expect(xor.evaluateOutput("Y")).toBe(0 ^ 1);
 
-    xor.setInput("A", true);
-    xor.setInput("B", false);
-    expect(xor.evaluateOutput("Y")).toBe(Boolean(1 ^ 0));
+    xor.setInput("A", 1);
+    xor.setInput("B", 0);
+    expect(xor.evaluateOutput("Y")).toBe(1 ^ 0);
 
-    xor.setInput("A", true);
-    xor.setInput("B", true);
-    expect(xor.evaluateOutput("Y")).toBe(Boolean(1 ^ 1));
+    xor.setInput("A", 1);
+    xor.setInput("B", 1);
+    expect(xor.evaluateOutput("Y")).toBe(1 ^ 1);
   });
 
   test("or circuit", () => {
     const or = new LogicBlock("or", (circuit) => {
-      circuit.addInput("A", false);
-      circuit.addInput("B", false);
+      circuit.addInput("A", 0);
+      circuit.addInput("B", 0);
 
       circuit.addOutput("X");
 
@@ -64,27 +64,27 @@ describe("combinational circuits", () => {
       circuit.connect("OR", "B");
     });
 
-    or.setInput("A", false);
-    or.setInput("B", false);
-    expect(or.evaluateOutput("X")).toBe(Boolean(0 || 0));
+    or.setInput("A", 0);
+    or.setInput("B", 0);
+    expect(or.evaluateOutput("X")).toBe(0 | 0);
 
-    or.setInput("A", false);
-    or.setInput("B", true);
-    expect(or.evaluateOutput("X")).toBe(Boolean(0 || 1));
+    or.setInput("A", 0);
+    or.setInput("B", 1);
+    expect(or.evaluateOutput("X")).toBe(0 | 1);
 
-    or.setInput("A", true);
-    or.setInput("B", false);
-    expect(or.evaluateOutput("X")).toBe(Boolean(1 || 0));
+    or.setInput("A", 1);
+    or.setInput("B", 0);
+    expect(or.evaluateOutput("X")).toBe(1 | 0);
 
-    or.setInput("A", true);
-    or.setInput("B", true);
-    expect(or.evaluateOutput("X")).toBe(Boolean(1 || 1));
+    or.setInput("A", 1);
+    or.setInput("B", 1);
+    expect(or.evaluateOutput("X")).toBe(1 | 1);
   });
 
   test("and circuit", () => {
     const and = new LogicBlock("and", (circuit) => {
-      circuit.addInput("A", false);
-      circuit.addInput("B", false);
+      circuit.addInput("A", 0);
+      circuit.addInput("B", 0);
 
       circuit.addOutput("X");
 
@@ -95,44 +95,44 @@ describe("combinational circuits", () => {
       circuit.connect("AND", "B");
     });
 
-    and.setInput("A", false);
-    and.setInput("B", false);
-    expect(and.evaluateOutput("X")).toBe(Boolean(0 && 0));
+    and.setInput("A", 0);
+    and.setInput("B", 0);
+    expect(and.evaluateOutput("X")).toBe(0 & 0);
 
-    and.setInput("A", false);
-    and.setInput("B", true);
-    expect(and.evaluateOutput("X")).toBe(Boolean(0 && 1));
+    and.setInput("A", 0);
+    and.setInput("B", 1);
+    expect(and.evaluateOutput("X")).toBe(0 & 1);
 
-    and.setInput("A", true);
-    and.setInput("B", false);
-    expect(and.evaluateOutput("X")).toBe(Boolean(1 && 0));
+    and.setInput("A", 1);
+    and.setInput("B", 0);
+    expect(and.evaluateOutput("X")).toBe(1 & 0);
 
-    and.setInput("A", true);
-    and.setInput("B", true);
-    expect(and.evaluateOutput("X")).toBe(Boolean(1 && 1));
+    and.setInput("A", 1);
+    and.setInput("B", 1);
+    expect(and.evaluateOutput("X")).toBe(1 & 1);
   });
 
   test("not circuit", () => {
     const not = new LogicBlock("not", (circuit) => {
       circuit.addOutput("X");
-      circuit.addInput("A", false);
+      circuit.addInput("A", 0);
       circuit.addNotGate("NOT");
 
       circuit.connect("X", "NOT");
       circuit.connect("NOT", "A");
     });
 
-    not.setInput("A", false);
-    expect(not.evaluateOutput("X")).toBe(!(0));
+    not.setInput("A", 0);
+    expect(not.evaluateOutput("X")).toBe(1);
 
-    not.setInput("A", true);
-    expect(not.evaluateOutput("X")).toBe(!(1));
+    not.setInput("A", 1);
+    expect(not.evaluateOutput("X")).toBe(0);
   });
 
   test("nand circuit (merging)", () => {
     const and = new LogicBlock("and", (circuit) => {
-      circuit.addInput("A", false);
-      circuit.addInput("B", false);
+      circuit.addInput("A", 0);
+      circuit.addInput("B", 0);
 
       circuit.addOutput("X");
 
@@ -145,7 +145,7 @@ describe("combinational circuits", () => {
 
     const not = new LogicBlock("not", (circuit) => {
       circuit.addOutput("Y");
-      circuit.addInput("C", false);
+      circuit.addInput("C", 0);
       circuit.addNotGate("NOT");
 
       circuit.connect("Y", "NOT");
@@ -154,32 +154,32 @@ describe("combinational circuits", () => {
 
     const nand = LogicBlock.merge("nand", and, not, circuit => circuit.connect("C", "X"));
 
-    nand.setInput("A", false);
-    nand.setInput("B", false);
-    expect(nand.evaluateOutput("Y")).toBe(Boolean(!(0 && 0)));
+    nand.setInput("A", 0);
+    nand.setInput("B", 0);
+    expect(nand.evaluateOutput("Y")).toBe(1);
 
-    nand.setInput("A", false);
-    nand.setInput("B", true);
-    expect(nand.evaluateOutput("Y")).toBe(Boolean(!(0 && 1)));
+    nand.setInput("A", 0);
+    nand.setInput("B", 1);
+    expect(nand.evaluateOutput("Y")).toBe(1);
 
-    nand.setInput("A", true);
-    nand.setInput("B", false);
-    expect(nand.evaluateOutput("Y")).toBe(Boolean(!(1 && 0)));
+    nand.setInput("A", 1);
+    nand.setInput("B", 0);
+    expect(nand.evaluateOutput("Y")).toBe(1);
 
-    nand.setInput("A", true);
-    nand.setInput("B", true);
-    expect(nand.evaluateOutput("Y")).toBe(Boolean(!(1 && 1)));
+    nand.setInput("A", 1);
+    nand.setInput("B", 1);
+    expect(nand.evaluateOutput("Y")).toBe(0);
   });
 })
 
 describe("sequential circuits", () => {
   test("sr-latch", () => {
     const sr = new LogicBlock("sr", circuit => {
-      circuit.addInput("!R", true);
-      circuit.addInput("!S", true);
+      circuit.addInput("!R", 1);
+      circuit.addInput("!S", 1);
 
-      circuit.addOutput("Q", true);
-      circuit.addOutput("!Q", false);
+      circuit.addOutput("Q", 1);
+      circuit.addOutput("!Q", 0);
 
       circuit.addNandGate("NAND:!R", 2);
       circuit.addNandGate("NAND:!S", 2);
@@ -195,40 +195,40 @@ describe("sequential circuits", () => {
     });
 
     // initial state is set
-    expect(sr.evaluateOutput("Q")).toBe(true);
-    expect(sr.evaluateOutput("!Q")).toBe(false);
+    expect(sr.evaluateOutput("Q")).toBe(1);
+    expect(sr.evaluateOutput("!Q")).toBe(0);
 
     // reset latch
-    sr.setInput("!S", true);
-    sr.setInput("!R", false); 
+    sr.setInput("!S", 1);
+    sr.setInput("!R", 0); 
 
-    expect(sr.evaluateOutput("Q")).toBe(false);
-    expect(sr.evaluateOutput("!Q")).toBe(true);
+    expect(sr.evaluateOutput("Q")).toBe(0);
+    expect(sr.evaluateOutput("!Q")).toBe(1);
 
 
     // no change
-    sr.setInput("!S", true);
-    sr.setInput("!R", true);
+    sr.setInput("!S", 1);
+    sr.setInput("!R", 1);
     
-    expect(sr.evaluateOutput("Q")).toBe(false);
-    expect(sr.evaluateOutput("!Q")).toBe(true);
+    expect(sr.evaluateOutput("Q")).toBe(0);
+    expect(sr.evaluateOutput("!Q")).toBe(1);
 
 
    // set latch 
-    sr.setInput("!S", false);
-    sr.setInput("!R", true);
+    sr.setInput("!S", 0);
+    sr.setInput("!R", 1);
     
-    expect(sr.evaluateOutput("Q")).toBe(true);
-    expect(sr.evaluateOutput("!Q")).toBe(false);
+    expect(sr.evaluateOutput("Q")).toBe(1);
+    expect(sr.evaluateOutput("!Q")).toBe(0);
   });
 
   test("gated sr-latch", () => {
     const sr = new LogicBlock("sr", circuit => {
-      circuit.addInput("!R", true);
-      circuit.addInput("!S", true);
+      circuit.addInput("!R", 1);
+      circuit.addInput("!S", 1);
 
-      circuit.addOutput("Q", true);
-      circuit.addOutput("!Q", false);
+      circuit.addOutput("Q", 1);
+      circuit.addOutput("!Q", 0);
 
       circuit.addNandGate("NAND:!R", 2);
       circuit.addNandGate("NAND:!S", 2);
@@ -244,9 +244,9 @@ describe("sequential circuits", () => {
     });
 
     const en = new LogicBlock("en", circuit => {
-      circuit.addInput("S", false);
-      circuit.addInput("R", false);
-      circuit.addInput("EN", false);
+      circuit.addInput("S", 0);
+      circuit.addInput("R", 0);
+      circuit.addInput("EN", 0);
 
       circuit.addNandGate("NAND:S", 2);
       circuit.addNandGate("NAND:R", 2);
@@ -270,32 +270,32 @@ describe("sequential circuits", () => {
     });
 
 
-    expect(gsr.evaluateOutput("Q")).toBe(true);
-    expect(gsr.evaluateOutput("!Q")).toBe(false);
+    expect(gsr.evaluateOutput("Q")).toBe(1);
+    expect(gsr.evaluateOutput("!Q")).toBe(0);
 
-    gsr.setInput("R", true);
+    gsr.setInput("R", 1);
 
-    expect(gsr.evaluateOutput("Q")).toBe(true);
-    expect(gsr.evaluateOutput("!Q")).toBe(false);
+    expect(gsr.evaluateOutput("Q")).toBe(1);
+    expect(gsr.evaluateOutput("!Q")).toBe(0);
 
-    gsr.setInput("EN", true);
+    gsr.setInput("EN", 1);
 
-    expect(gsr.evaluateOutput("Q")).toBe(false);
-    expect(gsr.evaluateOutput("!Q")).toBe(true);
+    expect(gsr.evaluateOutput("Q")).toBe(0);
+    expect(gsr.evaluateOutput("!Q")).toBe(1);
 
-    gsr.setInput("R", false);
-    gsr.setInput("EN", false);
+    gsr.setInput("R", 0);
+    gsr.setInput("EN", 0);
 
-    gsr.setInput("S", true);
+    gsr.setInput("S", 1);
 
-    expect(gsr.evaluateOutput("Q")).toBe(false);
-    expect(gsr.evaluateOutput("!Q")).toBe(true);
+    expect(gsr.evaluateOutput("Q")).toBe(0);
+    expect(gsr.evaluateOutput("!Q")).toBe(1);
 
-    gsr.setInput("S", true);
-    gsr.setInput("EN", true);    
+    gsr.setInput("S", 1);
+    gsr.setInput("EN", 1);    
 
-    expect(gsr.evaluateOutput("Q")).toBe(true);
-    expect(gsr.evaluateOutput("!Q")).toBe(false);
+    expect(gsr.evaluateOutput("Q")).toBe(1);
+    expect(gsr.evaluateOutput("!Q")).toBe(0);
   })
 })
 

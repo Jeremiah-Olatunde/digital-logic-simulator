@@ -1,6 +1,8 @@
 
 import LogicCircuit from "./LogicCircuit.js";
 
+type BoolInt = 0 | 1;
+
 export class LogicBlock {
   public circuit: LogicCircuit;
 
@@ -9,15 +11,15 @@ export class LogicBlock {
     configure?.(this.circuit);
   }
 
-  public setInput(uid: string, value: boolean): void {
+  public setInput(uid: string, value: BoolInt): void {
     this.circuit.setInput(uid, value);
   }
 
-  public getInput(uid: string): boolean {
+  public getInput(uid: string): BoolInt {
     return this.circuit.getInput(uid);
   }
 
-  public evaluateOutput(uid: string): boolean {
+  public evaluateOutput(uid: string): BoolInt {
     return this.circuit.evaluateOutput(uid);
   }
 
