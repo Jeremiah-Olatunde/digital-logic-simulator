@@ -1,0 +1,37 @@
+{
+  "name": "fyp",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "logic gate level microprocessor simulation",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --roots dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeremiah-Olatunde/fyp.git"
+  },
+  "keywords": [
+    "microprocessor",
+    "logic",
+    "typescript"
+  ],
+  "author": "Jesuseun Jeremiah Olatunde",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jeremiah-Olatunde/fyp/issues"
+  },
+  "homepage": "https://github.com/Jeremiah-Olatunde/fyp#readme",
+  "devDependencies": {
+    "@babel/core": "^7.21.5",
+    "@babel/preset-env": "^7.21.5",
+    "@babel/preset-typescript": "^7.21.5",
+    "@jest/globals": "^29.5.0",
+    "babel-jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  }
+}

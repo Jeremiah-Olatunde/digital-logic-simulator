@@ -1,0 +1,152 @@
+
+{
+
+  //  ROOT OPTIONS
+  /*---------------------------------------------------------------------*/
+
+    // "files": false,
+    // "extends": false,
+    "include": ["./src/**/*"],
+    "exclude": ["./node_modules/**/*", "./dist/**/*"],
+    // "references": false,
+
+  /*---------------------------------------------------------------------*/
+
+
+  "compilerOptions": {
+
+    /* TYPE CHECKING */
+    /*---------------------------------------------------------------------*/
+
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "alwaysStrict": true, // true if strict
+      "exactOptionalPropertyTypes": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitAny": true, // true if strict
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true, // true if strict
+
+      // "noPropertyAccessFromIndexSignature": true, // ATTENTION!!!
+      // "noUncheckedIndexedAccess": true, // ATTENTION!!!
+
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "strict": true,
+      "strictBindCallApply": true, // true if strict
+      "strictFunctionTypes": true, // true if strict
+      "strictNullChecks": true, // true if strict
+      "strictPropertyInitialization": true, // true if strict
+      "useUnknownInCatchVariables": true,
+
+    /*---------------------------------------------------------------------*/
+
+    /* MODULES */
+    /*---------------------------------------------------------------------*/
+      "allowImportingTsExtensions": false,
+      "allowUmdGlobalAccess": false,
+      "baseUrl": "./",
+      "module": "esnext",
+      "moduleResolution": "node", 
+      "moduleSuffixes": [""],
+      "paths": {},
+      "resolveJsonModule": true,
+      "rootDir": "./src",
+      "rootDirs": [],
+      "typeRoots": [],
+      "types": [],
+
+    /*---------------------------------------------------------------------*/
+
+    /* EMIT */
+    /*---------------------------------------------------------------------*/
+
+      "declaration": false, // true if composite
+      // "declarationDir": "./types",
+      "declarationMap": false,
+      "downlevelIteration": true,
+      "emitBOM": false,
+      "emitDeclarationOnly": false,
+      "importHelpers": false, // ATTENTION!!!
+      // "importsNotUsedAsValues": "error",
+      "inlineSourceMap": false, // Using sourceMap option instead
+      "inlineSources": true,
+
+      // "mapRoot": "link to source map location" // ATTENTION!!!
+      // "newLine": "clrf" // clrf (windows) lf (mac x linux)
+
+      "noEmit": false, // set to true when integrating Babel
+      "noEmitHelpers": false,
+      "noEmitOnError": true,
+      "outDir": "./dist",
+
+      // "outFIle": "" // used only with System or AMD modules
+
+      "preserveConstEnums": true, // true if isolatedModules
+      // "preserveValueImports": true, // module must be set to es2015 or later
+      "removeComments": false,
+      "sourceMap": true,
+
+      // "sourceRoot": "link to source map location" // ATTENTION
+
+      "stripInternal": false,
+
+    /*---------------------------------------------------------------------*/
+
+    /* JS */
+    /*---------------------------------------------------------------------*/
+
+      "allowJs": false,
+      "checkJs": false,
+      "maxNodeModuleJsDepth": 0,
+
+    /*---------------------------------------------------------------------*/
+
+    /* INTEROP CONSTRAINTS */
+    /*---------------------------------------------------------------------*/
+
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": false,
+      "forceConsistentCasingInFileNames": true,
+      "isolatedModules": true,
+      "preserveSymlinks": false,
+
+    /*---------------------------------------------------------------------*/
+
+    /* LANGUAGE AND ENVIRONMENT */
+    /*---------------------------------------------------------------------*/
+
+      "lib": ["esnext", "dom"],
+      "moduleDetection": "auto",
+      "noLib": false,
+      "target": "esnext",
+
+    /*---------------------------------------------------------------------*/
+
+    /* COMPILER DIAGNOSTICS */
+    /*---------------------------------------------------------------------*/
+
+      "diagnostics": false,
+      "explainFiles": false,
+      "extendedDiagnostics": false,
+      "listEmittedFiles": false,
+      "listFiles": false,
+      "traceResolution": false,
+
+    /*---------------------------------------------------------------------*/
+
+  },
+
+  "watchOptions": {
+
+      "watchFile": "usefsEvents",
+      "watchDirectory": "usefsEvents",
+      "fallbackPolling": "dynamicpriority",
+      "synchronousWatchDirectory": false,
+      "excludeDirectories": ["./node_modules/**/*", "./dist"],
+      "excludeFiles": [],
+
+  }
+
+}
