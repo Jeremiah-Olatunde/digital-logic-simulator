@@ -1,57 +1,124 @@
-
+ 
 import Graph from "../graph/graph.js";
 import CircuitElement from "./CircuitElement.js";
 
 type BoolInt = 0 | 1;
 
 export default class LogicCircuit {
-  public inputs: Set<string> = new Set();
-  public outputs: Set<string> = new Set();
-  public circuit: Graph<CircuitElement>;
-  public subCircuits: Map<string, { inputs: Set<string>, outputs: Set<string>}> = new Map();
+  public inputs: string[] = [];
+  public outputs: string[] = [];
+  public circuitGraph: Graph<CircuitElement>;
+  public subCircuits: Map<string, { inputs: string[], outputs: string[]}> = new Map();
 
-  constructor(public uid: string){ this.circuit = new Graph(uid); }
+  constructor(public uid: string){ this.circuitGraph = new Graph(uid); }
 
   //--- WIRING ----------------------------------------------------------------
     public connect(uid0: string, uid1: string){
-      const elmt0 = this.circuit.getVertex(uid0);
-      const elmt1 = this.circuit.getVertex(uid1);
-      if(elmt0.type === "input" && elmt1.type === "output"){
-        elmt0.hasValidCache = false;
-        this.inputs.delete(uid0);
-        this.outputs.delete(uid1)
-      }
-      this.circuit.addEdge(uid0, uid1);
+      const elmt0 = this.circuitGraph.getVertex(uid0);
+      const elmt1 = this.circuitGraph.getVertex(uid1);
+
+      if(elmt0.type === "output" && elmt1.type !== "gate") 
+        this.outputs.splice(this.outputs.findIndex(v => elmt0.uid === v), 1);
+      if(elmt1.type === "input") 
+        this.inputs.splice(this.inputs.findIndex(v => elmt1.uid === v), 1);
+
+      this.circuitGraph.addEdge(uid0, uid1);
     }
   //---------------------------------------------------------------------------
     
   //--- IO --------------------------------------------------------------------
-    public addInput(uid: string, value: BoolInt){
-      this.circuit.addVertex(CircuitElement.input(uid, value));
-      this.inputs.add(uid);
+    public addInput(uid: string, value: BoolInt = 0){
+      const input = CircuitElement.input(uid, value);
+      this.circuitGraph.addVertex(input);
+      this.inputs.push(input.uid);
     }
 
-     public addOutput(uid: string, value?: BoolInt){
-      this.circuit.addVertex(CircuitElement.output(uid, value));
-      this.outputs.add(uid);
+    public addOutput(uid: string, value: BoolInt = 0){
+      const output = CircuitElement.output(uid, value)
+      this.circuitGraph.addVertex(output);
+      this.outputs.push(output.uid);
+    }
+
+    public renameInput(uid: string, newUid: string){
+      const vertex = this.circuitGraph.expand(uid, this.inputs);
+      if(!this.inputs.includes(vertex))
+        throw new Error(`INPUT(${uid}) does not exist`);  
+
+      const input = this.circuitGraph.getVertex(uid);
+      this.inputs.splice(this.inputs.indexOf(input.uid), 1);
+      this.circuitGraph.renameVertex(uid, newUid);
+      this.inputs.push(input.uid);
+    }
+
+    public renameOutput(uid: string, newUid: string){
+      const vertex = this.circuitGraph.expand(uid, this.outputs);
+      if(!this.outputs.includes(vertex))
+        throw new Error(`OUTPUT(${uid}) does not exist`);  
+
+      const output = this.circuitGraph.getVertex(uid);
+      this.outputs.splice(this.outputs.indexOf(output.uid), 1);
+      this.circuitGraph.renameVertex(uid, newUid);
+      this.outputs.push(output.uid);
     }
 
     public setInput(uid: string, value: BoolInt){
-      if(!this.inputs.has(uid)) throw new Error(`INPUT(${uid}) does not exist`);
-      // if(this.circuit.getVertex(uid).cachedValue === value) return;
-      this.circuit.getVertex(uid).cachedValue = value;
+    const vertex = this.circuitGraph.expand(uid, this.inputs);
+    if(!this.inputs.includes(vertex))
+      throw new Error(`INPUT(${uid}) does not exist`);  
+
+      this.circuitGraph.dfs(vertex, (v) => {
+        const inputs: BoolInt[] = [];
+
+        for(const elmt of this.circuitGraph.getAdjacentVertices(v.uid, "inward"))
+          inputs.push(this.circuitGraph.getVertex(elmt).cachedValue);
+
+        const prevValue = v.cachedValue;
+        v.cachedValue = v.operation(v.uid == vertex ? [ value ] : inputs);
+
+        return prevValue === v.cachedValue;
+      });
     }
 
     public getInput(uid: string): BoolInt {
-      if(!this.inputs.has(uid)) throw new Error(`INPUT(${uid}) does not exist`);
-      return this.circuit.getVertex(uid).cachedValue;
+      if(!this.inputs.includes(this.circuitGraph.expand(uid, this.inputs)))
+        throw new Error(`INPUT(${uid}) does not exist`);       
+      return this.circuitGraph.getVertex(uid).cachedValue;
+    }
+
+    public getOutput(uid: string): BoolInt {
+      const output = this.circuitGraph.expand(uid, this.outputs);
+      if(!this.outputs.includes(output))
+        throw new Error(`OUTPUT(${uid}) does not exist`);
+
+      return this.circuitGraph.getVertex(output).cachedValue;
+    }
+
+    public initialize(){
+      for(const input of this.inputs){
+        // console.log();
+        // console.log("initializing", input);
+
+        this.circuitGraph.dfs(input, (v) => {
+          const inputs: [string, BoolInt][] = [];
+
+          for(const elmt of this.circuitGraph.getAdjacentVertices(v.uid, "inward"))
+            inputs.push([elmt, this.circuitGraph.getVertex(elmt).cachedValue]);
+
+          v.cachedValue = v.operation(v.uid == input ? [ v.cachedValue ] : inputs.map(v => v[1]));
+          // console.log(v.uid, [inputs], v.cachedValue);
+        });   
+      }
     }
   //---------------------------------------------------------------------------
 
   //--- LOGIC GATES -----------------------------------------------------------
     public addGate(uid: string, inputCount: number, logic: (inputs: BoolInt[]) => BoolInt){
-      this.circuit.addVertex(CircuitElement.gate(uid, inputCount, logic));
+      this.circuitGraph.addVertex(CircuitElement.gate(uid, inputCount, logic));
     }
+
+    public addIdentityGate(uid: string){
+      this.addGate(uid, 1, inputs => inputs[0]);
+    }    
 
     public addNotGate(uid: string){
       this.addGate(uid, 1, inputs => inputs[0] ? 0 : 1);
@@ -72,50 +139,36 @@ export default class LogicCircuit {
     public addNandGate(uid: string, inputCount: number){
       this.addGate(uid, inputCount, inputs => inputs.reduce((p, v) => p && v) ? 0 : 1);
     }
+
+    public addXorGate(uid: string, inputCount: number){
+      this.addGate(uid, inputCount, inputs => inputs.reduce((p, v) => (p as number ^ v as number) as BoolInt));
+    }
+
+    public addXnorGate(uid: string, inputCount: number){
+      this.addGate(uid, inputCount, inputs => inputs.reduce((p, v) => (p as number ^ v as number) as BoolInt) ? 0 : 1);
+    }
   //---------------------------------------------------------------------------
 
   //--- MERGING ---------------------------------------------------------------
     public static merge(
       uid: string, 
-      circuit0: LogicCircuit, 
-      circuit1: LogicCircuit
+      circuitGraph0: LogicCircuit, 
+      circuitGraph1: LogicCircuit
     ): LogicCircuit {
-      const { uid: uid0, inputs: inputs0, outputs: outputs0 } = circuit0;
-      const { uid: uid1, inputs: inputs1, outputs: outputs1 } = circuit1;
-      const circuit = new LogicCircuit(uid);
+      const circuitGraph = new LogicCircuit(uid);
 
-      circuit.inputs = new Set([...inputs0, ...inputs1]);
-      circuit.outputs = new Set([...outputs0, ...outputs1]);
+      const { uid: uid0, inputs: inputs0, outputs: outputs0 } = circuitGraph0;
+      const { uid: uid1, inputs: inputs1, outputs: outputs1 } = circuitGraph1;
 
-      circuit.subCircuits.set(uid0, { inputs: inputs0, outputs: outputs0 });
-      circuit.subCircuits.set(uid1, { inputs: inputs1, outputs: outputs1 });
+      circuitGraph.subCircuits.set(uid0, { inputs: inputs0, outputs: outputs0 });
+      circuitGraph.subCircuits.set(uid1, { inputs: inputs1, outputs: outputs1 });
 
-      circuit.circuit = Graph.merge(uid, circuit0.circuit, circuit1.circuit);
+      circuitGraph.inputs = [...inputs0.map(input => `${uid}::${input}`), ...inputs1.map(input => `${uid}::${input}`)];
+      circuitGraph.outputs = [...outputs0.map(input => `${uid}::${input}`), ...outputs1.map(input => `${uid}::${input}`)];
 
-      return circuit;
-    }
-  //---------------------------------------------------------------------------
+      circuitGraph.circuitGraph = Graph.merge(uid, circuitGraph0.circuitGraph, circuitGraph1.circuitGraph);
 
-  //--- EVALUATION ------------------------------------------------------------
-    public evaluateOutput(uid: string): BoolInt {
-      if(!this.outputs.has(uid)) throw new Error(`OUTPUT(${uid}) NOT FOUND`);
-
-      const accum: [string, BoolInt][] = [];
-
-      this.circuit.dfs(uid, "outward", {
-        preOrder: (v, { visited }) => { 
-          if(v.hasValidCache || visited) accum.push([v.uid, v.cachedValue]);
-          return v.hasValidCache;
-        },
-
-        postOrder: (v) => {
-          const output = v.operation(accum.splice(-v.inputCount).map(i => i[1]));
-          v.cachedValue = output; 
-          accum.push([v.uid, output]);
-        }
-      });
-
-      return accum[0][1];
+      return circuitGraph;
     }
   //---------------------------------------------------------------------------
 }

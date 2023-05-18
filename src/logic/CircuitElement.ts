@@ -3,7 +3,6 @@ type BoolInt = 0 | 1;
 
 export default class CircuitElement {
   public cachedValue: BoolInt = 0;
-  public hasValidCache: boolean = false;
 
   constructor(
     public uid: string, 
@@ -15,13 +14,12 @@ export default class CircuitElement {
   public static input(uid: string, value: BoolInt): CircuitElement {
     const input = new CircuitElement(uid, "input", 1, input => input[0]);
     input.cachedValue = value; 
-    input.hasValidCache = true;
     return input;
   }
 
-  public static output(uid: string, value?: BoolInt): CircuitElement {
+  public static output(uid: string, value: BoolInt): CircuitElement {
     const output = new CircuitElement(uid, "output", 1, input => input[0]);
-    if(value !== undefined) output.cachedValue = value; 
+    output.cachedValue = value; 
     return output;
   }
 

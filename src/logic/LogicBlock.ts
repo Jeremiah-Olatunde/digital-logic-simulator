@@ -9,6 +9,7 @@ export class LogicBlock {
   constructor(public uid: string, configure?: (circuit: LogicCircuit) => void){
     this.circuit = new LogicCircuit(uid);
     configure?.(this.circuit);
+    this.circuit.initialize();
   }
 
   public setInput(uid: string, value: BoolInt): void {
@@ -19,8 +20,8 @@ export class LogicBlock {
     return this.circuit.getInput(uid);
   }
 
-  public evaluateOutput(uid: string): BoolInt {
-    return this.circuit.evaluateOutput(uid);
+  public getOutput(uid: string): BoolInt {
+    return this.circuit.getOutput(uid);
   }
 
   public static merge(
