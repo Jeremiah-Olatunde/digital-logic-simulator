@@ -78,7 +78,7 @@
 
       "noEmit": false, // set to true when integrating Babel
       "noEmitHelpers": false,
-      "noEmitOnError": true,
+      "noEmitOnError": false,
       "outDir": "./dist",
 
       // "outFIle": "" // used only with System or AMD modules

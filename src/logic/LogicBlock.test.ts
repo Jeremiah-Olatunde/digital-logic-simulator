@@ -1,13 +1,13 @@
 import { test, describe, expect } from "@jest/globals";
-import { LogicBlock } from "./LogicBlock.js";
+import LogicBlock from "./LogicBlock.js";
 
 describe("combinational circuits", () => {
   test("or circuit", () => {
-    const or = new LogicBlock("or", (circuit) => {
+    const or = new LogicBlock("or", [], (circuit) => {
       circuit.addOutput("X");
       circuit.addInput("A");
       circuit.addInput("B");
-      circuit.addOrGate("OR", 2);
+      circuit.addOrGate("OR");
 
       circuit.connect("OR", "X");
       circuit.connect("A", "OR");
@@ -32,11 +32,11 @@ describe("combinational circuits", () => {
   });
 
   test("and circuit", () => {
-    const and = new LogicBlock("and", (circuit) => {
+    const and = new LogicBlock("and", [], (circuit) => {
       circuit.addOutput("X");
       circuit.addInput("A");
       circuit.addInput("B");
-      circuit.addAndGate("AND", 2);
+      circuit.addAndGate("AND");
 
       circuit.connect("AND", "X");
       circuit.connect("A", "AND");
@@ -61,7 +61,7 @@ describe("combinational circuits", () => {
   });
 
   test("not circuit", () => {
-    const not = new LogicBlock("not", (circuit) => {
+    const not = new LogicBlock("not", [], (circuit) => {
       circuit.addOutput("X");
       circuit.addInput("A");
       circuit.addNotGate("NOT");
@@ -78,7 +78,7 @@ describe("combinational circuits", () => {
   });
 
   test("xor circuit", () => {
-    const xor = new LogicBlock("xor", (circuit) => {
+    const xor = new LogicBlock("xor", [], (circuit) => {
       circuit.addOutput("Y");
 
       circuit.addInput("A");
@@ -87,10 +87,10 @@ describe("combinational circuits", () => {
       circuit.addNotGate("NOT(A)");
       circuit.addNotGate("NOT(B)");
 
-      circuit.addAndGate("AND(A)", 2);
-      circuit.addAndGate("AND(B)", 2);
+      circuit.addAndGate("AND(A)");
+      circuit.addAndGate("AND(B)");
 
-      circuit.addOrGate("OR(0)", 2);
+      circuit.addOrGate("OR(0)");
 
 
       circuit.connect("OR(0)", "Y");
@@ -126,18 +126,18 @@ describe("combinational circuits", () => {
   });
 
   test("nand circuit (merging)", () => {
-    const and = new LogicBlock("and", (circuit) => {
+    const and = new LogicBlock("and", [], (circuit) => {
       circuit.addOutput("X");
       circuit.addInput("A");
       circuit.addInput("B");
-      circuit.addAndGate("AND", 2);
+      circuit.addAndGate("AND");
 
       circuit.connect("AND", "X");
       circuit.connect("A", "AND");
       circuit.connect("B", "AND");
     });
 
-    const not = new LogicBlock("not", (circuit) => {
+    const not = new LogicBlock("not", [], (circuit) => {
       circuit.addOutput("X");
       circuit.addInput("A");
       circuit.addNotGate("NOT");
@@ -146,39 +146,42 @@ describe("combinational circuits", () => {
       circuit.connect("A", "NOT");
     });
 
-    const nand = LogicBlock.merge("nand", and, not, circuit => {
+    const nand = new LogicBlock("nand", [and, not], circuit => {
       circuit.connect("and::X", "not::A");
+      circuit.extend("and::A", "A");
+      circuit.extend("and::B", "B");
+      circuit.extend("not::X", "X");
     });
 
-    nand.setInput("and::A", 0);
-    nand.setInput("and::B", 0);
-    expect(nand.getOutput("not::X")).toBe(1);
+    nand.setInput("A", 0);
+    nand.setInput("B", 0);
+    expect(nand.getOutput("X")).toBe(1);
 
-    nand.setInput("and::A", 0);
-    nand.setInput("and::B", 1);
-    expect(nand.getOutput("not::X")).toBe(1);
+    nand.setInput("A", 0);
+    nand.setInput("B", 1);
+    expect(nand.getOutput("X")).toBe(1);
 
-    nand.setInput("and::A", 1);
-    nand.setInput("and::B", 0);
-    expect(nand.getOutput("not::X")).toBe(1);
+    nand.setInput("A", 1);
+    nand.setInput("B", 0);
+    expect(nand.getOutput("X")).toBe(1);
 
-    nand.setInput("and::A", 1);
-    nand.setInput("and::B", 1);
-    expect(nand.getOutput("not::X")).toBe(0);
+    nand.setInput("A", 1);
+    nand.setInput("B", 1);
+    expect(nand.getOutput("X")).toBe(0);
   });
 })
 
 describe("sequential circuits", () => {
   test("sr-latch", () => {
-    const sr = new LogicBlock("sr", circuit => {
+    const sr = new LogicBlock("sr", [], circuit => {
       circuit.addInput("!R", 1);
       circuit.addInput("!S", 1);
 
       circuit.addOutput("Q", 1);
       circuit.addOutput("!Q", 0);
 
-      circuit.addNandGate("N(!R)", 2);
-      circuit.addNandGate("N(!S)", 2);
+      circuit.addNandGate("N(!R)");
+      circuit.addNandGate("N(!S)");
 
       circuit.connect( "N(!S)", "Q");
       circuit.connect("N(!R)", "!Q");
@@ -219,15 +222,15 @@ describe("sequential circuits", () => {
   });  
 
   test("gated sr-latch", () => {
-    const sr = new LogicBlock("sr", circuit => {
+    const sr = new LogicBlock("sr", [], circuit => {
       circuit.addInput("!R", 1);
       circuit.addInput("!S", 1);
 
       circuit.addOutput("Q", 1);
       circuit.addOutput("!Q", 0);
 
-      circuit.addNandGate("N(!R)", 2);
-      circuit.addNandGate("N(!S)", 2);
+      circuit.addNandGate("N(!R)");
+      circuit.addNandGate("N(!S)");
 
       circuit.connect( "N(!S)", "Q");
       circuit.connect("N(!R)", "!Q");
@@ -239,13 +242,13 @@ describe("sequential circuits", () => {
       circuit.connect("Q", "N(!R)");
     });
 
-    const en = new LogicBlock("en", circuit => {
+    const en = new LogicBlock("en", [], circuit => {
       circuit.addInput("S", 0);
       circuit.addInput("R", 0);
       circuit.addInput("EN", 0);
 
-      circuit.addNandGate("N(S)", 2);
-      circuit.addNandGate("N(R)", 2);
+      circuit.addNandGate("N(S)");
+      circuit.addNandGate("N(R)");
 
       circuit.addOutput("X");
       circuit.addOutput("Y");
@@ -260,9 +263,16 @@ describe("sequential circuits", () => {
       circuit.connect("EN", "N(R)");
     });
 
-    const gsr = LogicBlock.merge("gsr", sr, en, circuit => {
-      circuit.connect("X", "!S");
-      circuit.connect("Y", "!R");
+    const gsr = new LogicBlock("gsr", [sr, en],  circuit => {
+      circuit.connect("en::X", "sr::!S");
+      circuit.connect("en::Y", "sr::!R");
+
+      circuit.extend("en::S", "S");
+      circuit.extend("en::R", "R");
+      circuit.extend("en::EN", "EN");
+
+      circuit.extend("sr::Q", "Q")
+      circuit.extend("sr::!Q", "!Q")
     });
 
 
@@ -294,5 +304,4 @@ describe("sequential circuits", () => {
     expect(gsr.getOutput("!Q")).toBe(0);
   });
 })
-
 export {}

@@ -20,7 +20,9 @@ export default class Graph<T extends Vertex> {
     }
 
     public getVertex(vertexId: string): T {
-      return this.vertices.get(this.expand(vertexId, this.vertices.keys()))!;
+      const vertex = this.vertices.get(vertexId);
+      if(!vertex) throw new Error(`${vertexId} not found`);
+      return vertex;
     }
 
     public removeVertex(vertexId: string){
@@ -32,7 +34,7 @@ export default class Graph<T extends Vertex> {
       vertexId: string, 
       direction: "outward" | "inward"
     ): Set<string> {
-      return this[`${direction}Edges`].get(this.expand(vertexId, this.vertices.keys()))!;
+      return this[`${direction}Edges`].get(vertexId)!;
     }
 
     public renameVertex(vertexId: string, newUid: string){
@@ -82,7 +84,7 @@ export default class Graph<T extends Vertex> {
     public addEdge(init: string, term: string){
       const initV = this.getVertex(init).uid; 
       const termV = this.getVertex(term).uid;
-      this.outwardEdges.get(initV)?.add(this.expand(termV, this.vertices.keys()));
+      this.outwardEdges.get(initV)?.add(termV);
       this.inwardEdges.get(termV)?.add(initV)
     }
 
@@ -104,40 +106,54 @@ export default class Graph<T extends Vertex> {
       start: string,
       callback?: (vertex: T) => boolean | void,
     ): void {
-      const visited: string[] = [];
-      const stack: string[] = [this.expand(start, this.vertices.keys())];
-      let vertex: string | undefined;
 
-      while(vertex = stack.pop()) {
-        if(visited.includes(vertex)) continue;
-        else visited.push(vertex);
+      const stack: Set<string> = new Set();
 
+      const descend = (v: string, depth: number) => {
+        if(stack.has(v)) return;
+        else stack.add(v);
 
-        if(callback?.(this.getVertex(vertex))) continue;
-        stack.push(...this.getAdjacentVertices(vertex, "outward"));
+        if(callback?.(this.getVertex(v))) return;
+        
+        for(const next of this.getAdjacentVertices(v, "outward")) 
+          descend(next, ++depth);
+
+        stack.delete(v);
       }
+
+      descend(start, 0);
     }
   //---------------------------------------------------------------------------
 
   //--- MERGING ---------------------------------------------------------------
     public static merge<V extends Vertex> (
-      uid: string, graph0: Graph<V>, graph1: Graph<V>
+      uid: string, graphs: Graph<V>[]
     ): Graph<V> {
       const newGraph = new this<V>(uid);
 
-      graph0.vertices.forEach(newGraph.addVertex.bind(newGraph));
-      graph1.vertices.forEach(newGraph.addVertex.bind(newGraph));
+      graphs.forEach(graph => {
+        graph.vertices.forEach(v => newGraph.addVertex(v));
+        
+        for(const [init, adjacent] of graph.outwardEdges.entries())
+          for(const term of adjacent.values()) 
+            newGraph.addEdge(`${uid}::${init}`, `${uid}::${term}`);
+      })
 
-      for(const [init, adjacent] of graph0.outwardEdges.entries())
-        for(const term of adjacent.values()) 
-          newGraph.addEdge(init, term);
-      
-      for(const [init, adjacent] of graph1.outwardEdges.entries())
-        for(const term of adjacent.values()) 
-          newGraph.addEdge(init, term);
-      
       return newGraph;
     }
   //---------------------------------------------------------------------------
 
 }
+
+
+      // const visited: Set<string> = new Set();
+      // const stack: string[] = [start];
+      // let vertex: string | undefined;
+
+      // while(vertex = stack.pop()) {
+      //   if(visited.has(vertex)) continue;
+      //   else visited.add(vertex);
+
+      //   if(callback?.(this.getVertex(vertex))) continue;
+      //   stack.push(...this.getAdjacentVertices(vertex, "outward"));
+      // }
