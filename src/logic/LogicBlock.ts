@@ -1,7 +1,4 @@
-
 import LogicCircuit from "./LogicCircuit.js";
-
-type BoolInt = 0 | 1;
 
 export default class LogicBlock {
   private circuit: LogicCircuit;

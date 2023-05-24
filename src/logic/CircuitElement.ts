@@ -1,5 +1,3 @@
-type BoolInt = 0 | 1;
-
 
 export default class CircuitElement {
   public value: BoolInt = 0;

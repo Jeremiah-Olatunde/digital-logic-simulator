@@ -1,8 +1,5 @@
- 
 import Graph from "../graph/graph.js";
 import CircuitElement from "./CircuitElement.js";
-
-type BoolInt = 0 | 1;
 
 export default class LogicCircuit {
   private graph: Graph<CircuitElement>;
@@ -74,8 +71,9 @@ export default class LogicCircuit {
         const [c, el] = uid1.split("::");
         const input = this.subCircuits.get(c)?.inputs.get(el);
 
+
         if(input && this.gates.has(uid0))
-          this.graph.addEdge(input, this.gates.get(uid1)!);  
+          this.graph.addEdge(this.gates.get(uid0)!, input);  
          else 
           throw new Error(`circuit to sub-circuit connection error ${uid0} -> ${uid1}`);               
       }

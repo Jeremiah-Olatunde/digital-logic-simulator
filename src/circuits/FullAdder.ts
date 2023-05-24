@@ -62,8 +62,8 @@ export class XBitFullAdder extends LogicBlock {
 
     let sum: string = "";
 
-    for(let i = 0; i < 4; i++)
-      sum +=  this.getOutput(`S${3 - i}`).toString();
+    for(let i = 0; i < this.bits; i++)
+      sum +=  this.getOutput(`S${this.bits - i - 1}`).toString();
     
     return sum;
   }

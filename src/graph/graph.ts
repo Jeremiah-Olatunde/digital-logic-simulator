@@ -2,9 +2,9 @@
 type Vertex = { uid: string };
 
 export default class Graph<T extends Vertex> {
-  public vertices: Map<string, T> = new Map();
-  public outwardEdges: Map<string, Set<string>> = new Map();
-  public inwardEdges: Map<string, Set<string>> = new Map();
+  private vertices: Map<string, T> = new Map();
+  private outwardEdges: Map<string, Set<string>> = new Map();
+  private inwardEdges: Map<string, Set<string>> = new Map();
 
   constructor(public uid: string){}
 
@@ -35,48 +35,6 @@ export default class Graph<T extends Vertex> {
       direction: "outward" | "inward"
     ): Set<string> {
       return this[`${direction}Edges`].get(vertexId)!;
-    }
-
-    public renameVertex(vertexId: string, newUid: string){
-      const vertex = this.getVertex(vertexId);
-      const oldUid = vertex.uid;
-
-      vertex.uid = vertex.uid.replace(`::${vertex.uid.split("::").at(-1)}`, `::${newUid}`);
-
-      this.vertices.set(vertex.uid, vertex);
-      this.vertices.delete(oldUid);
-
-      this.outwardEdges.forEach(v => {
-        if(!v.has(oldUid)) return;
-        v.add(vertex.uid);
-        v.delete(oldUid);
-      });
-
-      this.outwardEdges.set(vertex.uid, this.outwardEdges.get(oldUid)!);
-      this.outwardEdges.delete(oldUid);
-
-      this.inwardEdges.forEach(v => {
-        if(!v.has(oldUid)) return;
-        v.add(vertex.uid);
-        v.delete(oldUid);
-      });
-
-      this.inwardEdges.set(vertex.uid, this.inwardEdges.get(oldUid)!);
-      this.inwardEdges.delete(oldUid);
-    }
-
-    public expand(uid: string, paths: Iterable<string>): string {
-      const path = uid.split("::");
-      const matches = [];
-
-      for(const vUid of paths) {
-        const fullPath = vUid.split("::");
-        if(path.every(v => fullPath.includes(v))) matches.push(vUid);
-      }
-
-      if(matches.length === 0) throw new Error(`${uid} 404 not found in ${[...paths]}`);
-      else if(matches.length === 1) return matches[0];
-      else throw new Error(`${uid} duplicate elements`);
     }
   //---------------------------------------------------------------------------
 
@@ -146,14 +104,14 @@ export default class Graph<T extends Vertex> {
 }
 
 
-      // const visited: Set<string> = new Set();
-      // const stack: string[] = [start];
-      // let vertex: string | undefined;
+// const visited: Set<string> = new Set();
+// const stack: string[] = [start];
+// let vertex: string | undefined;
 
-      // while(vertex = stack.pop()) {
-      //   if(visited.has(vertex)) continue;
-      //   else visited.add(vertex);
+// while(vertex = stack.pop()) {
+//   if(visited.has(vertex)) continue;
+//   else visited.add(vertex);
 
-      //   if(callback?.(this.getVertex(vertex))) continue;
-      //   stack.push(...this.getAdjacentVertices(vertex, "outward"));
-      // }
+//   if(callback?.(this.getVertex(vertex))) continue;
+//   stack.push(...this.getAdjacentVertices(vertex, "outward"));
+// }
